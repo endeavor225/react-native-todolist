@@ -1,12 +1,12 @@
-import {  Image, Text, TouchableOpacity } from 'react-native'
-import React from 'react'
-import checkImg from "../../assets/check.png"
-import { s } from './CardTodo.style'
-export default function CardTodo({ todo, onPress, onLongPress }) {
+import { Image, Text, TouchableOpacity } from "react-native";
+
+import checkImg from "../../assets/check.png";
+import { s } from "./CardTodo.style";
+export function CardTodo({ todo, onPress, onLongPress }) {
   return (
-    <TouchableOpacity 
-      onLongPress={()=>onLongPress(todo)} 
-      onPress={() => onPress(todo)} 
+    <TouchableOpacity
+      onLongPress={() => onLongPress(todo)}
+      onPress={() => onPress(todo)}
       style={s.card}
     >
       <Text
@@ -19,5 +19,5 @@ export default function CardTodo({ todo, onPress, onLongPress }) {
       </Text>
       {todo.isCompleted && <Image style={s.img} source={checkImg} />}
     </TouchableOpacity>
-  )
+  );
 }
