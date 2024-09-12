@@ -4,9 +4,10 @@ import { s } from "./App.style";
 import { Header } from "./components/Header/Header";
 import CardTodo from "./components/CardTodo/CardTodo";
 import { useState } from "react";
+import { TabBottomMenu } from "./components/TabBottomMenu/TabBottomMenu";
 
 export default function App() {
-
+  const [selectedTabName, setSelectedTabName] = useState("all");
   const [todoList, setTodoList] = useState([
     { id: 1, title: "Sortir le chien", isCompleted: true },
     { id: 2, title: "Aller chez le garagiste", isCompleted: false },
@@ -17,7 +18,6 @@ export default function App() {
     { id: 7, title: "Faire les courses", isCompleted: true },
     { id: 8, title: "Appeler le vétérinaire", isCompleted: true },
   ]);
-
 
   function updateTodo(todo) {
     const updatedTodo = {
@@ -31,7 +31,7 @@ export default function App() {
 
     const updatedTodoList = [...todoList];
     updatedTodoList[indexToUpdate] = updatedTodo;
-    setTodoList(updatedTodoList)
+    setTodoList(updatedTodoList);
   }
 
   function renderTodoList() {
@@ -44,19 +44,20 @@ export default function App() {
 
   return (
     <>
-    <SafeAreaProvider>
-      <SafeAreaView style={s.app}>
-        <View style={s.header}>
-          <Header />
-        </View>
-        <View style={s.body}>
-          <ScrollView>{renderTodoList()}</ScrollView>
-        </View>
-      </SafeAreaView>
-    </SafeAreaProvider>
-    <View style={s.footer}>
-      <Text>Footer</Text>
-    </View>
+      <SafeAreaProvider>
+        <SafeAreaView style={s.app}>
+          <View style={s.header}>
+            <Header />
+          </View>
+          <View style={s.body}>
+            <ScrollView>{renderTodoList()}</ScrollView>
+          </View>
+        </SafeAreaView>
+      </SafeAreaProvider>
+      <TabBottomMenu
+        onPress={setSelectedTabName}
+        selectedTabName={selectedTabName}
+      />
 </>
   );
 }
