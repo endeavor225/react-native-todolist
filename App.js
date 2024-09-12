@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, ScrollView, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { s } from "./App.style";
@@ -8,12 +8,54 @@ import { Header } from "./components/Header/Header";
 import { TabBottomMenu } from "./components/TabBottomMenu/TabBottomMenu";
 import Dialog from "react-native-dialog";
 import uuid from "react-native-uuid";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
+let isFirstRender = true;
+let isLoadUpdate = false;
 export default function App() {
   const [selectedTabName, setSelectedTabName] = useState("all");
   const [todoList, setTodoList] = useState([]);
   const [isAddDialogVisible, setIsAddDialogVisible] = useState(false);
   const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => {
+    loadTodoList();
+  }, []);
+
+  useEffect(() => {
+    if (isLoadUpdate) {
+      isLoadUpdate = false;
+    } else {
+      if (!isFirstRender) {
+        saveTodoList();
+      } else {
+        isFirstRender = false;
+      }
+    }
+  }, [todoList]);
+  async function saveTodoList() {
+    console.log("SAVE");
+    try {
+      await AsyncStorage.setItem("@todolist", JSON.stringify(todoList));
+    } catch (err) {
+      alert("Erreur " + err);
+    }
+  }
+
+  async function loadTodoList() {
+    console.log("LOAD");
+    try {
+      const stringifiedTodoList = await AsyncStorage.getItem("@todolist");
+      if (stringifiedTodoList !== null) {
+        const parsedTodoList = JSON.parse(stringifiedTodoList);
+        isLoadUpdate = true;
+        setTodoList(parsedTodoList);
+      }
+    } catch (err) {
+      alert("Erreur " + err);
+    }
+  }
+
   function getFilteredList() {
     switch (selectedTabName) {
       case "all":
@@ -37,6 +79,7 @@ export default function App() {
     const updatedTodoList = [...todoList];
     updatedTodoList[indexToUpdate] = updatedTodo;
     setTodoList(updatedTodoList);
+    shouldSave = true;
   }
 
   function deleteTodo(todoToDelete) {
@@ -45,6 +88,7 @@ export default function App() {
         text: "Supprimer",
         style: "destructive",
         onPress: () => {
+          shouldSave = true;
           setTodoList(todoList.filter((todo) => todo.id !== todoToDelete.id));
         },
       },
@@ -72,8 +116,9 @@ export default function App() {
       title: inputValue,
       isCompleted: false,
     };
-
+    shouldSave = true;
     setTodoList([...todoList, newTodo]);
+    setInputValue("")
     setIsAddDialogVisible(false);
   }
   return (
